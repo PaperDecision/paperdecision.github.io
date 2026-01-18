@@ -1,0 +1,2046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaperDecision | Modeling the Complete Peer Review Process</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a0a0f;
+            --secondary: #12121a;
+            --accent: #1a1a25;
+            --highlight: #ffffff;
+            --text: #ffffff;
+            --text-muted: #8a8a9a;
+            --bg: #0a0a0f;
+            --card-bg: #14141f;
+            --border: #2a2a3a;
+            --accent-color: #6366f1;
+            
+            /* 新增炫酷渐变色 */
+            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            --gradient-text: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+            --glow-purple: 0 0 20px rgba(99, 102, 241, 0.4);
+            --glow-pink: 0 0 20px rgba(236, 72, 153, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .abstract-box {
+            width: 90%;
+            max-width: 1600px;      
+            margin: 40px auto;      
+            padding: 30px 40px;
+            background-color: rgba(20, 20, 31, 0.8);
+            color: var(--text);
+            border: 1px solid var(--border);
+
+            line-height: 1.65; /* Better for long lines */
+            font-family: "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .abstract-box p {
+            text-align: justify;
+            font-size: 1.1rem; /* Slightly larger font helps fill the width better */
+        }
+
+        .abstract-box h3 {
+            text-align: center;
+            margin-bottom: 1.5em;
+            font-size: 1.8rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 15, 0.95);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--gradient-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo span {
+            background: var(--gradient-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text);
+        }
+
+        /* Hero Section */
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            background: var(--bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 50% 0%, rgba(0, 0, 0, 0.02) 0%, transparent 50%);
+        }
+
+        .hero-content {
+            max-width: 1000px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 1400px;
+            margin: 0 auto 2rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        .btn-primary:hover {
+            background: #333333;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: #6366f1;
+            box-shadow: var(--glow-purple);
+        }
+
+        /* Teaser Image */
+        .teaser-container {
+            margin-top: 2rem;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .teaser-image {
+            width: 100%;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        }
+
+        .teaser-caption {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Sections */
+        section {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 4rem auto;
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        .highlight-box h3 {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .highlight-box p {
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: #6366f1;
+            transform: translateY(-4px);
+            box-shadow: var(--glow-purple);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Results Table */
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem 0;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: #1a1a28;
+            font-weight: 600;
+            color: #a5a5b5;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+        
+        .highlight-row {
+            background: rgba(99, 102, 241, 0.15);
+        }
+        
+        .highlight-row:hover {
+            background: rgba(99, 102, 241, 0.25);
+        }
+
+        /* Year Data Containers */
+        .year-data {
+            display: none;
+        }
+
+        .year-data.active {
+            display: block;
+        }
+
+        /* Predictions Section */
+        .predictions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .prediction-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .prediction-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .model-tag {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+
+        .model-tag.optimistic {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+
+        .model-tag.conservative {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+
+        .prediction-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .prediction-stat {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .prediction-stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .prediction-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Findings Section */
+        .findings-list {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .finding-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+        }
+
+        .finding-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            min-width: 40px;
+        }
+
+        .finding-content h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .finding-content p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        .code-block .comment {
+            color: var(--text-muted);
+        }
+
+        .code-block .keyword {
+            color: var(--text);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary);
+            border-top: 1px solid var(--border);
+            padding: 4rem 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .footer-section h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a:hover {
+            color: var(--text);
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .predictions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .nav-links {
+                display: none;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Correlation Table */
+        .correlation-positive {
+            color: #22c55e;
+        }
+
+        .correlation-negative {
+            color: #ef4444;
+        }
+
+        /* Architecture Diagram */
+        .architecture {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 3rem 0;
+        }
+
+        .agent-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .agent-box {
+            background: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .agent-box h5 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .agent-box p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .arrow {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        /* Download Section */
+        .download-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .download-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .download-card:hover {
+            border-color: #6366f1;
+            transform: translateY(-2px);
+            box-shadow: var(--glow-purple);
+        }
+        .teaser-link {
+            color: #a855f7;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .teaser-link:hover,
+        .teaser-link:visited,
+        .teaser-link:active,
+        .teaser-link:focus {
+            color: #c084fc;
+            text-decoration: underline;
+        }
+
+        .download-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .download-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .download-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Analysis Cards */
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .analysis-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .analysis-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .analysis-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .analysis-card li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .analysis-card li:last-child {
+            border-bottom: none;
+        }
+
+        .analysis-card li strong {
+            color: var(--text);
+        }
+
+        /* Year tabs */
+        .year-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .year-tab {
+            padding: 0.5rem 1.5rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+
+        .year-tab.active {
+            background: var(--gradient-primary);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: var(--glow-purple);
+        }
+
+        .year-tab:hover:not(.active) {
+            border-color: var(--text-muted);
+        }
+
+        /* Subsection headers */
+        .subsection-header {
+            margin: 3rem 0 1.5rem;
+        }
+
+        .subsection-header h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subsection-header p {
+            color: var(--text-muted);
+        }
+        
+    </style>
+    <script src="figures/predictions_data.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="#" class="logo">Paper<span>Decision</span></a>
+            <ul class="nav-links">
+                <!-- 1. About -->
+                <li><a href="#about">About</a></li>
+                <!-- 2. Prediction (原本在后面，移到这里并改名) -->
+                <li><a href="#predictions">Prediction</a></li>
+                <!-- 3. Experimental Results (原 Results 改名) -->
+                <li><a href="#results">Experimental Results</a></li>
+                <!-- 4. Analysis -->
+                <li><a href="#analysis">Analysis</a></li>
+                <!-- 5. Download -->
+                <li><a href="#download">Download</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>ICLR 2026 Acceptance Prediction: Benchmarking Decision Process with A Multi-Agent System</h1>
+            <p>A multi-agent system and benchmark for end-to-end peer review modeling, enabling real-world evaluation and predictive insights for future conference decisions.</p>
+            <div class="cta-buttons">
+                <a href="#predictions" class="btn btn-primary">
+                    Predicted Accept List
+                </a>
+                <a href="https://github.com/PaperDecision/PaperDecision" class="btn btn-secondary">
+                    GitHub Repository
+                </a>
+            </div>
+
+            <div class="abstract-box">
+                <h3>Why and How We Build PaperDecision</h3>
+            
+                <p>
+                    Peer review is fundamental to academic research but remains challenging to model due to its subjectivity, dynamics, and multi-stage complexity. Previous efforts leveraging large language models (LLMs) have primarily explored isolated sub-tasks, such as review generation or score prediction, failing to capture the entire evaluation workflow.
+                </p>
+            
+                <p>
+                    To this end, we introduce PaperDecision to model the peer review process end-to-end. Central to our approach is PaperDecision-Bench, a large-scale multimodal benchmark that links OpenReview papers, reviews, rebuttals, and final decisions across multiple conference cycles. By continuously incorporating newly released conference rounds, the benchmark remains forward-looking and helps avoid risks of data leakage in evaluation.
+                </p>
+            
+                <p>
+                    Building on this benchmark, we develop PaperDecision-Agent, a multi-agent system that simulates the roles and interactions of authors, reviewers, and area chairs. Empirically, frontier multimodal LLMs achieve up to ~82% accuracy in accept-reject prediction. We further provide in-depth analysis of the decision-making process, identifying several key factors associated with acceptance outcomes, such as reviewer expertise and score change. Overall, PaperDecision establishes the first dynamic and extensible benchmark for automated peer review, laying the groundwork for more accurate, transparent, and scalable AI-assisted paper decision systems.
+                </p>
+            </div>
+            
+            <!-- Teaser Image -->
+            <figure class="teaser-container">
+                <img src="figures/teaser.png" alt="Visualization showing factors influencing paper acceptance as a race toward an acceptance gate, with arrows indicating correlation strength and direction" class="teaser-image" loading="lazy">
+                <figcaption class="teaser-caption">Factors influencing paper acceptance, visualized as a race toward the 'ACCEPTANCE' gate. Arrow direction and metaphorical elements reflect the sign and relative strength of correlations between review process features and final acceptance decisions.</figcaption>
+                <!-- 新增的跳转链接 -->
+                <a href="#analysis" class="teaser-link">
+                    <span>Explore detailed experimental findings</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                    </svg>
+                </a>
+            </figure>
+        </div>
+    </section>
+    <!-- ICLR 2026 Predictions - Interactive Query -->
+    <div class="highlight-box" id="predictions">
+        <h3>🔮 ICLR 2026 Prediction Lookup</h3>
+        <p>Enter your OpenReview submission ID or paper title to check predictions from our multi-agent system.</p>
+        
+        <!-- Search Box -->
+        <div style="max-width: 600px; margin: 2rem auto;">
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                <input 
+                    type="text" 
+                    id="paper-search-input" 
+                    placeholder="Enter Submission Number (e.g., 17135) or Paper Title"
+                    style="
+                        flex: 1;
+                        min-width: 280px;
+                        padding: 1rem 1.5rem;
+                        border-radius: 8px;
+                        border: 1px solid #2a2a3a;
+                        background: #14141f;
+                        color: #ffffff;
+                        font-size: 1rem;
+                        font-family: inherit;
+                        outline: none;
+                        transition: border-color 0.2s;
+                    "
+                    onfocus="this.style.borderColor='#999999'"
+                    onblur="this.style.borderColor='#e0e0e0'"
+                >
+                <button 
+                id="search-btn"
+                onclick="searchPaper()"
+                style="
+                    padding: 1rem 2rem;
+                    border-radius: 8px;
+                    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+                    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);                    color: #ffffff;
+                    border: none;
+                    font-size: 1rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    font-family: inherit;
+                "
+                onmouseover="this.style.boxShadow='0 0 30px rgba(99, 102, 241, 0.7)'"
+                onmouseout="this.style.boxShadow='0 0 20px rgba(99, 102, 241, 0.4)'"
+            >
+                🔍 Search
+            </button>
+            </div>
+            
+            <div id="data-loading-status" style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted); transition: opacity 0.5s;">
+                <div id="progress-text">Connecting to database... If the process is taking longer than expected, you can download the file for offline viewing.</div>
+                <div id="progress-bar-bg" style="width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 0.5rem; display: none;">
+                    <div id="progress-bar-fill" style="width: 0%; height: 100%; background: var(--text); border-radius: 2px; transition: width 0.1s;"></div>
+                </div>
+            </div>
+
+            <!-- 原有的 Loading Indicator (用于搜索时的转圈) -->
+            <div id="loading-indicator" style="display: none; margin-top: 1.5rem; color: var(--text-muted);">
+                <span style="animation: pulse 1.5s infinite;">Searching...</span>
+            </div>
+            
+            <!-- Data Loading Status -->
+            <div id="data-load-status" style="margin-top: 1.5rem;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: var(--text-muted); font-size: 0.85rem;">
+                    <span id="status-icon">⏳</span>
+                    <span id="status-text">Initializing prediction database...</span>
+                </div>
+                <div id="progress-container" style="max-width: 400px; margin: 0.75rem auto 0; display: none;">
+                    <div style="background: var(--border); border-radius: 4px; height: 6px; overflow: hidden;">
+                        <div id="progress-bar" style="background: var(--text); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                    </div>
+                    <div id="progress-text" style="font-size: 0.75rem; margin-top: 0.5rem; font-family: 'JetBrains Mono', monospace;">0 / 0 entries</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div style="max-width: 800px; margin: 2rem auto 0; text-align: left;">
+            
+            <!-- Collapsible Header -->
+            <div onclick="toggleModelInfo()" style="cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; transition: color 0.2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-muted)'">
+                <span id="model-info-icon">▶</span>
+                <span>Understanding Model Biases — Important for Interpreting Results</span>
+            </div>
+            
+            <!-- Collapsible Content -->
+            <div id="model-info-content" style="display: none;">
+                
+                <!-- Two Model Cards Side by Side -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+
+<!-- GPT Card -->
+<div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+        <!-- OpenAI Logo SVG -->
+        <svg style="width: 1.1rem; height: 1.1rem;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.0462 6.0462 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.4848 4.4848 0 0 1 2.3655-1.9723V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.453l-.142.0805L8.704 5.4599a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l3.1028-1.7999 3.1028 1.7999v3.5916l-3.1028 1.7999-3.1028-1.7999z" fill="currentColor"/></svg>
+        
+        <strong>GPT-5.2</strong>
+        <span style="font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 50px; background: rgba(239, 68, 68, 0.2); color: #ef4444;">Rigorous</span>
+    </div>
+    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+        Very rigorous with only <strong style="color: var(--text);">24% accept</strong> rate. <strong>Almost never predicts Oral or Spotlight</strong> — if GPT accepts your paper, it is very likely to be high quality.
+    </p>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; font-size: 0.75rem;">
+        <div style="background: rgba(rgba(255,255,255,0.05)); padding: 0.5rem 0.25rem; border-radius: 6px; text-align: center;">
+            <div style="color: var(--text-muted);">Oral</div>
+            <div style="font-weight: 600; color: #ef4444;">0%</div>
+        </div>
+        <div style="background: rgba(rgba(255,255,255,0.05)); padding: 0.5rem 0.25rem; border-radius: 6px; text-align: center;">
+            <div style="color: var(--text-muted);">Spotlight</div>
+            <div style="font-weight: 600; color: #ef4444;">0.1%</div>
+        </div>
+        <div style="background: rgba(rgba(255,255,255,0.05)); padding: 0.5rem 0.25rem; border-radius: 6px; text-align: center;">
+            <div style="color: var(--text-muted);">Poster</div>
+            <div style="font-weight: 600;">24.1%</div>
+        </div>
+        <div style="background: rgba(rgba(255,255,255,0.05)); padding: 0.5rem 0.25rem; border-radius: 6px; text-align: center;">
+            <div style="color: var(--text-muted);">Reject</div>
+            <div style="font-weight: 600; color: #ef4444;">75.7%</div>
+        </div>
+    </div>
+</div>        
+                    <!-- Gemini Card -->
+<div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+        <img src="figures/gemini_logo.jpg" alt="Gemini logo" style="width: 1.1rem; height: 1.1rem; object-fit: contain;" />
+        <strong>Gemini 3.0 Pro</strong>
+        <span style="font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 50px; background: rgba(34, 197, 94, 0.2); color: #22c55e;">Lenient</span>
+    </div>
+    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+        More lenient with <strong style="color: #22c55e;">54% accept</strong> rate. Provides <strong>balanced predictions across all tiers</strong>. If Gemini rejects your paper, it likely has major issues.
+    </p>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; font-size: 0.75rem;">
+        <div style="background: rgba(rgba(255,255,255,0.05)); padding: 0.5rem 0.25rem; border-radius: 6px; text-align: center;">
+            <div style="color: var(--text-muted);">Oral</div>
+            <div style="font-weight: 600; color: #22c55e;">0.4%</div>
+        </div>
+        <div style="background: rgba(rgba(255,255,255,0.05)); padding: 0.5rem 0.25rem; border-radius: 6px; text-align: center;">
+            <div style="color: var(--text-muted);">Spotlight</div>
+            <div style="font-weight: 600; color: #22c55e;">4.9%</div>
+        </div>
+        <div style="background: rgba(rgba(255,255,255,0.05)); padding: 0.5rem 0.25rem; border-radius: 6px; text-align: center;">
+            <div style="color: var(--text-muted);">Poster</div>
+            <div style="font-weight: 600;">49.0%</div>
+        </div>
+        <div style="background: rgba(rgba(255,255,255,0.05)); padding: 0.5rem 0.25rem; border-radius: 6px; text-align: center;">
+            <div style="color: var(--text-muted);">Reject</div>
+            <div style="font-weight: 600;">45.7%</div>
+        </div>
+    </div>
+</div>
+
+                </div>
+                
+                <!-- Interpretation Guide -->
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid #2a2a3a; border-radius: 10px; padding: 1.25rem;">
+                    <div style="font-weight: 600; margin-bottom: 0.75rem; font-size: 0.95rem;">💡 How to Interpret Your Results</div>
+                    <div style="display: grid; gap: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">
+                        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                            <span style="color: #22c55e; font-size: 1.1rem; min-width: 24px;">✓✓</span>
+                            <div><strong style="color: var(--text);">Both Accept</strong> — Very high confidence of acceptance. Paper demonstrates quality across both rigorous and lenient evaluations.</div>
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                            <span style="color: #eab308; font-size: 1.1rem; min-width: 24px;">✓✗</span>
+                            <div><strong style="color: var(--text);">Gemini Accepts, GPT Rejects</strong> — Borderline case. A lenient AC may advocate for acceptance. More rigorous ones may raise concerns.</div>
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                            <span style="color: #ef4444; font-size: 1.1rem; min-width: 24px;">✗✗</span>
+                            <div><strong style="color: var(--text);">Both Reject</strong> — Significant concerns identified by both models. Likely needs substantial revision.</div>
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                            <span style="color: #22c55e; font-size: 1.1rem; min-width: 24px;">🌟</span>
+                            <div><strong style="color: var(--text);">Gemini predicts Oral/Spotlight</strong> — Use Gemini's tier for top-tier estimation since GPT almost never predicts these categories.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Link to detailed results -->
+                <div style="margin-top: 1rem; text-align: center; font-size: 0.85rem;">
+                    <a href="#results" style="color: var(--text-muted); text-decoration: underline; text-underline-offset: 3px;">
+                        📊 View detailed model performance metrics and error analysis →
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="prediction-result" style="display: none; margin-top: 2rem;"></div>
+        
+        <!-- Download Link -->
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                Want the complete dataset? Download all ~13,000 predictions with detailed reasoning.
+            </p>
+            <a href="#download" class="btn btn-secondary" style="font-size: 0.9rem;">
+                📥 Download Full Accept List & Reasoning
+            </a>
+        </div>
+    </div>
+
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .result-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: left;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+        
+        .prediction-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .prediction-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .prediction-value {
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .prediction-value.accept {
+            color: #22c55e;
+        }
+        
+        .prediction-value.reject {
+            color: #ef4444;
+        }
+        
+        .verdict-box {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        
+        .verdict-box.positive {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: #22c55e;
+        }
+        
+        .verdict-box.mixed {
+            background: rgba(234, 179, 8, 0.1);
+            border-color: #eab308;
+        }
+        
+        .verdict-box.negative {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+        
+        .verdict-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        .verdict-text {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .error-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            color: #dc2626;
+        }
+    </style>
+
+    <!-- About Section -->
+    <section id="about">
+        <div class="section-header">
+            <h2>About PaperDecision</h2>
+            <p>A structured work for comprehensive peer review modeling.</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>PaperDecision Benchmark</h3>
+                <p>Large-scale, multimodal benchmark integrating research papers and reviews across multiple stages with three-tier design for real-world prediction.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>PaperDecisionAgent</h3>
+                <p>Multi-agent system simulating interactions among authors, reviewers, and area chairs with specialized roles for each stage.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Reliable Prediction</h3>
+                <p>82.44% accuracy on ICLR 2025 for accept/reject prediction. Stable performance across years (2023-2025) demonstrates robust generalization.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Framework Section -->
+    <section id="framework">
+        <div class="section-header">
+            <h2>Multi-Agent System</h2>
+            <p>Our system models key roles in the real-world peer review process through specialized agents.</p>
+        </div>
+
+        <div class="teaser-container" style="margin: 3rem auto;">
+            <img src="figures/workflow.png" alt="Multi-Agent Framework Workflow" class="teaser-image">
+            <p class="teaser-caption">Overview of the PaperDecision-Agent workflow, simulating interactions among authors, reviewers, and ACs.</p>
+        </div>
+        <div class="architecture">
+            <div class="agent-flow">
+                <div class="agent-box">
+                    <h5>📝 Paper Reviewer</h5>
+                    <p>Initial evaluation of novelty, methodology, and quality</p>
+                </div>
+                <span class="arrow">→</span>
+                <div class="agent-box">
+                    <h5>📋 Review Summarizer</h5>
+                    <p>Aggregates feedback & assesses reliability</p>
+                </div>
+                <span class="arrow">→</span>
+                <div class="agent-box">
+                    <h5>💬 Rebuttal Analyzer</h5>
+                    <p>Evaluates author responses & attitude shifts</p>
+                </div>
+                <span class="arrow">→</span>
+                <div class="agent-box">
+                    <h5>⚖️ Decision Agent</h5>
+                    <p>Final accept/reject decision with reasoning</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="teaser-container" style="margin: 0 auto 3rem;">
+            <img src="figures/benchmark.png" alt="PaperDecision Benchmark Structure" class="teaser-image">
+            <p class="teaser-caption">The PaperDecision-Bench structure comprising Future Prediction (B1), Retrospective (B2), and Mini-Benchmark (B3).</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>B1: Future Prediction</h3>
+                <p>Target ICLR 2026 decision prediction where models observe papers and reviews while final outcomes remain hidden—gold-standard test of cross-temporal generalization.</p>
+            </div>
+            <div class="feature-card">
+                <h3>B2: Retrospective</h3>
+                <p>Complete ICLR 2023–2025 data for solid retrospective evaluation, enabling robust model comparison and systematic error analysis.</p>
+            </div>
+            <div class="feature-card">
+                <h3>B3: Mini-Benchmark</h3>
+                <p>Cost-efficient benchmark focusing on MLLM, 3D, and RL papers with ambiguous decision boundaries for rapid iteration.</p>
+            </div>
+        </div>
+    </section>
+
+    
+<!-- Results Section -->
+<section id="results">
+    <div class="section-header">
+        <h2>Experimental Results</h2>
+        <p>Comprehensive evaluation of frontier multimodal LLMs on ICLR paper acceptance prediction.</p>
+    </div>
+
+    <!-- Metrics Description -->
+    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: 2rem; max-width: 900px; margin-left: auto; margin-right: auto;">
+        <h4 style="margin-bottom: 1rem; font-size: 1rem;">📐 Evaluation Metrics</h4>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+            We report performance on the <strong>ICLR 2025</strong> benchmark, using ICLR 2024/2023 as historical reference. 
+            We evaluate both accept/reject decisions and the predicted tier (Oral/Spotlight/Poster).
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; font-size: 0.85rem;">
+            <div style="background: background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px;">
+                <div style="font-weight: 600; margin-bottom: 0.5rem;">Precision Metrics</div>
+                <ul style="color: var(--text-muted); padding-left: 1.25rem; margin: 0;">
+                    <li><strong>Accept Prec</strong> — Of all predicted accepts, how many are truly accepted</li>
+                    <li><strong>Reject Prec</strong> — Of all predicted rejects, how many are truly rejected</li>
+                </ul>
+            </div>
+            <div style="background: background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px;">
+                <div style="font-weight: 600; margin-bottom: 0.5rem;">Overall & Tier Metrics</div>
+                <ul style="color: var(--text-muted); padding-left: 1.25rem; margin: 0;">
+                    <li><strong>Acc</strong> — Binary accuracy (Accept vs Reject): the total number of correct predictions (true positives and true negatives) divided by the total number of predictions.</li>
+                    <li><strong>Oral/Spotlight/Poster F1</strong> — F1 score (balances precision and recall) for each tier</li>
+                </ul>
+            </div>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem; font-style: italic;">
+            Tables sorted by Accept Precision (descending).
+        </p>
+    </div>
+
+    <div class="year-tabs">
+        <button class="year-tab active" data-year="2025">ICLR 2025</button>
+        <button class="year-tab" data-year="2024">ICLR 2024</button>
+        <button class="year-tab" data-year="2023">ICLR 2023</button>
+    </div>
+    <!-- ICLR 2025 Data -->
+    <div class="year-data active" id="data-2025">
+        
+        <!-- Multi-Agent System Explanation -->
+        <div style="background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255,255,255,0.03) 100%); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: 2rem;">
+            <div style="display: flex; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap;">
+                <!-- Left: Title and Description -->
+                <div style="flex: 1; min-width: 280px;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                        <span style="font-size: 1.25rem;">🤖</span>
+                        <h4 style="margin: 0; font-size: 1.1rem;">Multi-Agent System Performance</h4>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0; line-height: 1.6;">
+                        Each row represents a <strong>complete multi-agent system</strong> powered by the specified backbone model. 
+                        The backbone handles all agent roles (Reviewer, Summarizer, Rebuttal Analyzer, Decision Maker).
+                    </p>
+                </div>
+                <!-- Right: Why Multi-Agent -->
+                <div style="flex: 1; min-width: 280px; background: rgba(255,255,255,0.03); border-radius: 8px; padding: 1rem 1.25rem;">
+                    <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">
+                        💡 Why Multi-Agent?
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0; line-height: 1.5;">
+                        Our experiments show that <strong>single-agent prediction</strong> (direct paper → decision) 
+                        achieves <strong>much lower accuracy</strong> than our multi-agent pipeline. 
+                        The structured workflow with specialized roles significantly improves prediction quality.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Backbone Model</th>
+                        <th>Accept Prec</th>
+                        <th>Reject Prec</th>
+                        <th>Acc</th>
+                        <th>Oral F1</th>
+                        <th>Spotlight F1</th>
+                        <th>Poster F1</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="highlight-row">
+                        <td><strong>GPT-5.2</strong></td>
+                        <td><strong>85.55%</strong></td>
+                        <td>79.95%</td>
+                        <td><strong>81.92%</strong></td>
+                        <td>0.00%</td>
+                        <td>9.33%</td>
+                        <td><strong>66.38%</strong></td>
+                    </tr>
+                    <tr>
+                        <td>MiniMax M2.1</td>
+                        <td>80.30%</td>
+                        <td>73.01%</td>
+                        <td>75.20%</td>
+                        <td>13.60%</td>
+                        <td>29.81%</td>
+                        <td>54.13%</td>
+                    </tr>
+                    <tr>
+                        <td>GPT-4.1</td>
+                        <td>79.94%</td>
+                        <td>81.08%</td>
+                        <td>80.63%</td>
+                        <td>38.64%</td>
+                        <td>32.52%</td>
+                        <td>47.09%</td>
+                    </tr>
+                    <tr>
+                        <td>Qwen3-Max</td>
+                        <td>72.50%</td>
+                        <td>75.56%</td>
+                        <td>74.38%</td>
+                        <td>22.88%</td>
+                        <td>15.15%</td>
+                        <td>36.39%</td>
+                    </tr>
+                    <tr>
+                        <td>Gemini 3 Pro</td>
+                        <td>66.04%</td>
+                        <td><strong>93.77%</strong></td>
+                        <td>76.72%</td>
+                        <td><strong>55.50%</strong></td>
+                        <td><strong>40.11%</strong></td>
+                        <td>62.65%</td>
+                    </tr>
+                    <tr>
+                        <td>Grok-4</td>
+                        <td>64.69%</td>
+                        <td>84.19%</td>
+                        <td>73.33%</td>
+                        <td>26.29%</td>
+                        <td>51.84%</td>
+                        <td>63.39%</td>
+                    </tr>
+                    <tr>
+                        <td>GLM-4.6v</td>
+                        <td>63.00%</td>
+                        <td>81.39%</td>
+                        <td>71.28%</td>
+                        <td>0.00%</td>
+                        <td>18.37%</td>
+                        <td>62.26%</td>
+                    </tr>
+                    <tr>
+                        <td>Gemini 2.5 Pro</td>
+                        <td>61.44%</td>
+                        <td>85.26%</td>
+                        <td>70.83%</td>
+                        <td>35.42%</td>
+                        <td>15.03%</td>
+                        <td>31.03%</td>
+                    </tr>
+                    <tr>
+                        <td>MiMo-VL-7B (RL)</td>
+                        <td>59.62%</td>
+                        <td>81.35%</td>
+                        <td>68.49%</td>
+                        <td>16.25%</td>
+                        <td>17.85%</td>
+                        <td>57.40%</td>
+                    </tr>
+                    <tr>
+                        <td>Doubao 1.6</td>
+                        <td>58.05%</td>
+                        <td>89.77%</td>
+                        <td>67.85%</td>
+                        <td>24.74%</td>
+                        <td>22.71%</td>
+                        <td>41.83%</td>
+                    </tr>
+                    <tr>
+                        <td>Kimi-VL</td>
+                        <td>44.29%</td>
+                        <td>92.49%</td>
+                        <td>45.93%</td>
+                        <td>0.92%</td>
+                        <td>20.06%</td>
+                        <td>50.57%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ICLR 2024 Data -->
+    <div class="year-data" id="data-2024">
+        
+        <!-- Multi-Agent System Explanation (Same style) -->
+        <div style="background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255,255,255,0.03) 100%); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: 2rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.1rem;">🤖</span>
+                <span style="font-size: 0.95rem; color: var(--text-muted);">
+                    Results from our <strong style="color: var(--text);">multi-agent pipeline</strong> using each backbone model.
+                </span>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Backbone Model</th>
+                        <th>Accept Prec</th>
+                        <th>Reject Prec</th>
+                        <th>Acc</th>
+                        <th>Oral F1</th>
+                        <th>Spotlight F1</th>
+                        <th>Poster F1</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="highlight-row">
+                        <td><strong>GPT-5.2</strong></td>
+                        <td><strong>85.50%</strong></td>
+                        <td>82.84%</td>
+                        <td><strong>83.70%</strong></td>
+                        <td>0.00%</td>
+                        <td>14.78%</td>
+                        <td><strong>63.96%</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Gemini 3 Pro</td>
+                        <td>63.90%</td>
+                        <td><strong>94.54%</strong></td>
+                        <td>76.91%</td>
+                        <td><strong>33.52%</strong></td>
+                        <td><strong>39.41%</strong></td>
+                        <td>58.96%</td>
+                    </tr>
+                    <tr>
+                        <td>Doubao 1.6</td>
+                        <td>54.67%</td>
+                        <td>90.36%</td>
+                        <td>66.73%</td>
+                        <td>18.05%</td>
+                        <td>29.07%</td>
+                        <td>39.36%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="color: var(--text-muted); text-align: center; margin-top: 1rem; font-size: 0.9rem;">
+            Results on ICLR 2024 show consistent patterns with 2025, GPT-5.2 achieving highest accuracy and accept precision.
+        </p>
+    </div>
+
+    <!-- ICLR 2023 Data -->
+    <div class="year-data" id="data-2023">
+        
+        <!-- Multi-Agent System Explanation (Same style) -->
+        <div style="background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255,255,255,0.03) 100%); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: 2rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.1rem;">🤖</span>
+                <span style="font-size: 0.95rem; color: var(--text-muted);">
+                    Results from our <strong style="color: var(--text);">multi-agent pipeline</strong> using each backbone model.
+                </span>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Backbone Model</th>
+                        <th>Accept Prec</th>
+                        <th>Reject Prec</th>
+                        <th>Acc</th>
+                        <th>Oral F1</th>
+                        <th>Spotlight F1</th>
+                        <th>Poster F1</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="highlight-row">
+                        <td><strong>GPT-5.2</strong></td>
+                        <td><strong>98.31%</strong></td>
+                        <td>72.01%</td>
+                        <td>77.03%</td>
+                        <td>0.00%</td>
+                        <td>8.33%</td>
+                        <td>44.78%</td>
+                    </tr>
+                    <tr>
+                        <td>Gemini 3 Pro</td>
+                        <td>91.20%</td>
+                        <td><strong>86.16%</strong></td>
+                        <td><strong>87.95%</strong></td>
+                        <td><strong>36.46%</strong></td>
+                        <td><strong>39.23%</strong></td>
+                        <td><strong>62.62%</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Doubao 1.6</td>
+                        <td>77.03%</td>
+                        <td>69.37%</td>
+                        <td>71.07%</td>
+                        <td>10.81%</td>
+                        <td>30.71%</td>
+                        <td>35.01%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="color: var(--text-muted); text-align: center; margin-top: 1rem; font-size: 0.9rem;">
+            ICLR 2023 results demonstrate strong cross-year generalization, with Gemini 3 Pro achieving 87.95% accuracy.
+        </p>
+    </div>
+
+
+            <!-- Error Analysis -->
+            <div class="subsection-header">
+                <h3>Error Analysis</h3>
+                <p>Understanding model behaviors and limitations on ICLR 2025.</p>
+            </div>
+    
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <h4>GPT Series vs. Gemini Series</h4>
+                    <ul>
+                        <li><strong>GPT Series (5.2 & 4.1):</strong> The "High Precision" choice. <strong>GPT-5.2</strong> gets the most accurate acc (~82% Accuracy) with very high Accept Precision (~85%). If GPT says "Accept", the paper is likely solid. GPT-4.1 is slightly less accurate.</li>
+                        <li><strong>Gemini Series (3 Pro & 2.5 Pro):</strong> The "High Recall" choice. <strong>Gemini 3 Pro</strong> has an impressive 93.77% Reject Precision—it rarely wrongly rejects a good paper. However, both Gemini models are "noisier" and tend to accept more borderline papers (lower Accept Precision around 60-66%) compared to GPT.</li>
+                    </ul>
+                </div>
+                <div class="analysis-card">
+                    <h4>Challenge: Predicting Top-Tier Papers</h4>
+                    <ul>
+                        <li><strong>Hard to Distinguish "Great" from "Good":</strong> Predicting exact tiers (Oral/Spotlight) is much harder than simple Accept/Reject. Most models have low F1 scores here.</li>
+                        <li><strong>The "Too Safe" Problem:</strong> Surprisingly, the most accurate model, <strong>GPT-5.2</strong>, has a <strong>0% F1 score on Orals</strong>. It plays it too safe, categorizing almost all accepted papers as "Posters" and failing to recognize excellent work.</li>
+                        <li><strong>Current Limit:</strong> Only Gemini 3 Pro shows decent ability to spot Orals (55% F1), making it the only reliable option for finding top 1% papers.</li>
+                    </ul>
+                </div>
+            </div>
+    </section>
+    <section id="analysis">
+        <div class="section-header">
+            <h2>Understanding How ICLR Makes Decisions</h2>
+            <p>The key factors that influence paper decisions.</p>
+        </div>
+
+        <h3 style="margin-bottom: 1.5rem;">What Correlates with Acceptance?</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Correlation</th>
+                        <th>Quick Take</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Average Reviewer Score <sup>†</sup></td>
+                        <td class="correlation-positive">+0.705</td>
+                        <td>The single biggest factor.</td>
+                    </tr>
+                    <tr>
+                        <td>Minimum Reviewer Score <sup>†</sup></td>
+                        <td class="correlation-positive">+0.617</td>
+                        <td>A low floor hurts you bad.</td>
+                    </tr>
+                    <tr>
+                        <td>Maximum Reviewer Score <sup>†</sup></td>
+                        <td class="correlation-positive">+0.542</td>
+                        <td>High scores help, but less than the average.</td>
+                    </tr>
+                    <tr>
+                        <td>Rebuttal Success Rate <sup>*</sup></td>
+                        <td class="correlation-positive">+0.530</td>
+                        <td>Rebuttals matter nearly as much as scores.</td>
+                    </tr>
+                    <tr>
+                        <td>Paper Novelty <sup>*</sup></td>
+                        <td class="correlation-positive">+0.270</td>
+                        <td>Being unique gives a moderate boost.</td>
+                    </tr>
+                    <tr>
+                        <td>Converted Reviewers (Low→High) <sup>*</sup></td>
+                        <td class="correlation-positive">+0.213</td>
+                        <td>Changing minds is a good sign.</td>
+                    </tr>
+                    <tr>
+                        <td>Paper Visual Quality <sup>*</sup></td>
+                        <td class="correlation-positive">+0.200</td>
+                        <td>Good formatting helps a little.</td>
+                    </tr>
+                    <tr>
+                        <td>Number of Shallow Reviewers <sup>*</sup></td>
+                        <td class="correlation-positive">+0.089</td>
+                        <td>Unprofessional reviewers can actually help papers get accepted.</td>
+                    </tr>
+                    <tr>
+                        <td>Score Variance <sup>†</sup></td>
+                        <td class="correlation-negative">-0.106</td>
+                        <td>Disagreement usually hurts.</td>
+                    </tr>
+                    <tr>
+                        <td>Score Range <sup>†</sup></td>
+                        <td class="correlation-negative">-0.119</td>
+                        <td>Wide gaps in scores are bad.</td>
+                    </tr>
+                    <tr>
+                        <td>Number of Expert Reviewers <sup>*</sup></td>
+                        <td class="correlation-negative">-0.132</td>
+                        <td>Experts are harder to please.</td>
+                    </tr>
+                    <tr>
+                        <td>Explicitly Stubborn Reviewers <sup>*</sup></td>
+                        <td class="correlation-negative">-0.323</td>
+                        <td>Stubborn reviewers are deal-breakers.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footnotes -->
+        <div style="margin-top: 1.5rem; padding: 1rem 1.5rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; color: var(--text-muted);">
+    
+            <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                <div style="width: 1.2rem; flex: 0 0 1.2rem; line-height: 1.4; font-weight: 600;">†</div>
+                <p style="margin: 0; line-height: 1.4;">
+                    <strong>Score-based features:</strong> Calculated directly from official ICLR reviewer scores (e.g., average, min, max, variance, range).
+                </p>
+            </div>
+        
+            <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                <div style="width: 1.2rem; flex: 0 0 1.2rem; line-height: 1.4; font-weight: 600;">*</div>
+                <p style="margin: 0; line-height: 1.4;">
+                    <strong>Agent-analyzed features:</strong> Evaluated by our multi-agent system. For example, <em>Rebuttal Success Rate</em> is assessed by the Rebuttal Analyzer agent, which analyzes rebuttal content and reviewer responses, then maps the outcome to a quantitative score for correlation analysis.
+                </p>
+            </div>
+        
+        </div>
+
+        <!-- Detailed Findings -->
+        <div class="subsection-header">
+            <h3>Key Insights</h3>
+        </div>
+
+        <div class="findings-list">
+            <div class="finding-item">
+                <div class="finding-number">01</div>
+                <div class="finding-content">
+                    <h4>Experts are Harder to Please</h4>
+                    <p>Papers assigned to expert reviewers are accepted <strong>less often</strong> (41.2% vs 58.8%). Experts are stricter: even if other reviewers like your paper, a single low score (≤4) from an expert can kill the paper. Their opinion often outweighs the non-experts.</p>
+                </div>
+            </div>
+            <div class="finding-item">
+                <div class="finding-number">02</div>
+                <div class="finding-content">
+                    <h4>Rebuttal Matters: Don't Be Defensive</h4>
+                    <p>A "Strong" rebuttal boosts acceptance to 66.1%, while a bad one drops it to 5.5%. <strong>How</strong> you reply is key: don't admit unfixable bugs or get angry. Authors who frame errors as "limitations for future work" succeed much more often.</p>
+                </div>
+            </div>
+            <div class="finding-item">
+                <div class="finding-number">03</div>
+                <div class="finding-content">
+                    <h4>Novelty as Primary Discriminator</h4>
+                    <p>"Groundbreaking" papers have a high (~70%) chance of acceptance. On the other hand, "Incremental" work—just combining existing methods with small changes—is rejected nearly <strong>90%</strong> of the time. The community strongly dislikes trivial updates.</p>
+                </div>
+            </div>
+            <div class="finding-item">
+                <div class="finding-number">04</div>
+                <div class="finding-content">
+                    <h4>The "Shallow Reviewer" Advantage</h4>
+                    <p>Surprisingly, having "shallow" (less detailed) reviewers actually <strong>helps</strong> your paper. They tend to give higher scores and increase your average score. On the other side, even if they give a low score, Area Chairs often ignore it because their review lacks detailed evidence.</p>
+                </div>
+            </div>
+            <div class="finding-item">
+                <div class="finding-number">05</div>
+                <div class="finding-content">
+                    <h4>Avoid Big Mistakes</h4>
+                    <p>57.1% of papers have unresolved baseline errors, and they still get 37.6% acceptance. But papers with no serious flaws achieve 71.5% acceptance and take 61.8% of oral slots. <strong>Fixing your weaknesses matters as much as showing your strengths.</strong></p>
+                </div>
+            </div>
+            <div class="finding-item">
+                <div class="finding-number">06</div>
+                <div class="finding-content">
+                    <h4>Reviewer Conversion Efficacy</h4>
+                    <p>Converting at least one reviewer from low to high scores increases acceptance from 32.6% to 52.5%. Successfully "converting" a skeptic into a supporter is one of the strong signals for acceptance.</p>
+                </div>
+            </div>
+        </div>
+
+                <!-- Additional Analysis Tables -->
+                <div class="analysis-grid" style="margin-top: 3rem;">
+                    <div class="analysis-card">
+                        <h4>High-Score Rejections (Avg ≥ 6.5)</h4>
+                        <ul>
+                            <li><strong>72 papers</strong> rejected despite high scores</li>
+                            <li><strong>51.4%:</strong> Unresolved baseline errors <sup>§</sup></li>
+                            <li><strong>11.1%:</strong> Unresolved math errors <sup>§</sup></li>
+                            <li><strong>43.1%:</strong> Flagged as "High Risk" <sup>¶</sup></li>
+                        </ul>
+                    </div>
+                    <div class="analysis-card">
+                        <h4>Low-Score Acceptances (Avg < 5.5)</h4>
+                        <ul>
+                            <li><strong>165 papers</strong> accepted despite low scores</li>
+                            <li><strong>57.0%:</strong> Had "Strong" rebuttals <sup>§</sup></li>
+                            <li>Successfully converted skeptical reviewers</li>
+                            <li>Credibly addressed technical concerns</li>
+                        </ul>
+                    </div>
+                </div>
+        
+                <!-- Footnotes for Error Analysis -->
+                <div style="margin-top: 1.5rem; padding: 1rem 1.5rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; color: var(--text-muted);">
+                    <p style="margin-bottom: 0.5rem;">
+                        <sup>§</sup> <strong>Agent-Identified Categories:</strong> Error types and rebuttal quality (e.g., "Strong") are classified by our agent system based on the analysis of review and rebuttal texts.
+                    </p>
+                    <p style="margin: 0;">
+                        <sup>¶</sup> <strong>"High Risk" Flag:</strong> Indicates papers containing credible technical criticisms identified by the agent, such as definition errors or data leakage. Critically, 43.1% of these high-score rejected cases were correctly flagged as <em>High Risk</em> by our system despite their positive numerical scores.
+                    </p>
+                </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download">
+        <div class="section-header">
+            <h2>Open Source Resources</h2>
+            <p>All data, code, and predictions are available.</p>
+        </div>
+
+        <div class="download-cards">
+            <a href="https://huggingface.co/datasets/simon123905/ICLR/blob/main/ICLR_2026_Accept-id.zip" class="download-card">
+                <div class="download-icon">🎯</div>
+                <div class="download-info">
+                    <h4>ICLR 2026 Accept Ids</h4>
+                    <p>Complete accept IDs for ICLR 2026.</p>
+                </div>
+            </a>
+            <a href="https://huggingface.co/datasets/simon123905/ICLR/blob/main/ICLR_2026_Prediction.zip" class="download-card">
+                <div class="download-icon">🎯</div>
+                <div class="download-info">
+                    <h4>ICLR 2026 Decision/Reasoning</h4>
+                    <p>Complete accept list with decisions (Oral/Spotlight/Poster/Reject) and detailed reasoning for ICLR 2026.</p>
+                </div>
+            </a>
+            <a href="https://huggingface.co/datasets/simon123905/ICLR/tree/main/ICLR_2023-2025" class="download-card">
+                <div class="download-icon">📊</div>
+                <div class="download-info">
+                    <h4>PaperDecision Benchmark</h4>
+                    <p>Full benchmark with ICLR 2023-2025 data, reviews, rebuttals, and decisions.</p>
+                </div>
+            </a>
+            <a href="https://github.com/PaperDecision/PaperDecision" class="download-card">
+                <div class="download-icon">💻</div>
+                <div class="download-info">
+                    <h4>Source Code</h4>
+                    <p>PaperDecision-Agent implementation and evaluation scripts.</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add scroll effect to nav
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.style.background = 'rgba(10, 10, 15, 0.98)';
+            } else {
+                nav.style.background = 'rgba(10, 10, 15, 0.95)';
+            }
+        });
+
+        // Year tabs functionality - NOW WORKING
+        document.querySelectorAll('.year-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                document.querySelectorAll('.year-tab').forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Hide all year data
+                document.querySelectorAll('.year-data').forEach(data => data.classList.remove('active'));
+                
+                // Show selected year data
+                const year = this.getAttribute('data-year');
+                document.getElementById('data-' + year).classList.add('active');
+            });
+        });
+                // ============ ICLR 2026 Prediction Search with Progress ============
+        
+                        // ============ ICLR 2026 Prediction Search ============
+        
+        let predictionsReady = false;
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusDiv = document.getElementById('data-load-status');
+            
+            // Check if data loaded from JS file
+            if (typeof PREDICTIONS_DATA !== 'undefined' && PREDICTIONS_DATA) {
+                const count = Object.keys(PREDICTIONS_DATA).length;
+                predictionsReady = true;
+                
+                document.getElementById('status-icon').textContent = '✅';
+                document.getElementById('status-text').textContent = `Ready! ${count.toLocaleString()} papers loaded.`;
+                statusDiv.style.color = '#22c55e';
+                
+                console.log(`Loaded ${count} predictions from JS file`);
+                
+                // Fade out status after 3 seconds
+                setTimeout(() => {
+                    statusDiv.style.opacity = '0.5';
+                }, 3000);
+            } else {
+                document.getElementById('status-icon').textContent = '❌';
+                document.getElementById('status-text').textContent = 'Failed to load prediction database';
+                statusDiv.innerHTML = `
+                    <div style="color: #ef4444; font-size: 0.85rem;">
+                        <strong>❌ Prediction data not found</strong><br>
+                        <span style="opacity: 0.8;">
+                            Please ensure <code>figures/predictions_data.js</code> exists.<br>
+                            Run <code>python convert_data.py</code> to generate it.
+                        </span>
+                    </div>
+                `;
+            }
+            
+            // Setup Enter key listener
+            const searchInput = document.getElementById('paper-search-input');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        searchPaper();
+                    }
+                });
+            }
+        });
+        
+        // Check if prediction is accept (non-reject)
+        function isAccept(prediction) {
+            if (!prediction) return false;
+            const p = prediction.toLowerCase();
+            return p.includes('oral') || p.includes('spotlight') || p.includes('poster') || p === 'accept';
+        }
+        
+        // Search function
+        function searchPaper() {
+            const input = document.getElementById('paper-search-input').value.trim();
+            const resultDiv = document.getElementById('prediction-result');
+            const loadingDiv = document.getElementById('loading-indicator');
+            
+            if (!input) {
+                resultDiv.innerHTML = '<div class="error-box">⚠️ Please enter a Submission Number or paper title.</div>';
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            if (!predictionsReady) {
+                resultDiv.innerHTML = '<div class="error-box">❌ Prediction database not loaded. Please refresh the page.</div>';
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            // Show loading
+            loadingDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+            
+            setTimeout(() => {
+                loadingDiv.style.display = 'none';
+                
+                let result = null;
+                const searchLower = input.toLowerCase().trim();
+                
+                // 1. Try exact submission number match
+                const submissionNum = parseInt(input);
+                if (!isNaN(submissionNum) && PREDICTIONS_DATA[submissionNum]) {
+                    result = PREDICTIONS_DATA[submissionNum];
+                }
+                
+                // 2. Try forum ID match (exact only)
+                if (!result) {
+                    result = Object.values(PREDICTIONS_DATA).find(p => 
+                        p.forum && p.forum.toLowerCase() === searchLower
+                    );
+                }
+
+                // 3. Try title match (only if input is not purely numeric)
+                if (!result && !/^\d+$/.test(input)) {
+                    result = Object.values(PREDICTIONS_DATA).find(p => 
+                        p.title && p.title.toLowerCase().includes(searchLower)
+                    );
+                }
+                
+                if (!result) {
+                    // Find similar results
+                    const searchWords = searchLower.split(/\s+/).filter(w => w.length > 3);
+                    let similar = [];
+                    
+                    if (searchWords.length > 0) {
+                        similar = Object.values(PREDICTIONS_DATA)
+                            .filter(p => p.title && searchWords.some(word => 
+                                p.title.toLowerCase().includes(word)
+                            ))
+                            .slice(0, 3);
+                    }
+                    
+                    let similarHtml = '';
+                    if (similar.length > 0) {
+                        similarHtml = `
+                            <div style="margin-top: 1rem; text-align: left;">
+                                <strong>Did you mean:</strong>
+                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem; list-style: none;">
+                                    ${similar.map(p => `
+                                        <li style="margin-bottom: 0.75rem; cursor: pointer;" 
+                                            onclick="document.getElementById('paper-search-input').value='${p.submission_number}'; searchPaper();">
+                                            <span style="color: var(--text); text-decoration: underline;">
+                                                #${p.submission_number}
+                                            </span>
+                                            <span style="color: var(--text-muted);"> - ${p.title.length > 70 ? p.title.substring(0, 70) + '...' : p.title}</span>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+                    
+                    resultDiv.innerHTML = `
+                        <div class="error-box">
+                            <strong>🔍 Paper not found</strong><br>
+                            <span style="font-size: 0.9rem; opacity: 0.8;">
+                                No results found for "<em>${input}</em>", or your average score is likely below 3.5, in which case acceptance is highly unlikely.<br>
+                                Please ensure you've entered a valid Submission ID (e.g., 17135) or try searching by keywords.
+                            </span>
+                            ${similarHtml}
+                        </div>
+                    `;
+                    resultDiv.style.display = 'block';
+                    return;
+                }
+                
+                // Found result - generate HTML
+                const gptAccept = isAccept(result.gpt_prediction);
+                const geminiAccept = isAccept(result.gemini_prediction);
+                
+                let verdictClass, verdictTitle, verdictText;
+                
+                if (gptAccept && geminiAccept) {
+                    verdictClass = 'positive';
+                    verdictTitle = '🎉 Multi-Agent Consensus: Strong Acceptance Signal';
+                    verdictText = `Both our <strong>Agent System 1 (based on GPT-5.2)</strong> and <strong>Agent System 2 (based on Gemini 3 Pro)</strong> recommend acceptance. Since these two systems use different evaluation biases (one more rigorous, one more lenient), their agreement suggests a <strong>very high chance</strong> that your paper will be accepted.`;
+                } else if (geminiAccept && !gptAccept) {
+                    verdictClass = 'mixed';
+                    verdictTitle = '⚖️ Agent Divergence - Borderline Case';
+                    verdictText = `There is a conflict between our systems. The <strong>Agent System 2 (based on Gemini 3 Pro)</strong> supports acceptance, but the <strong>Agent System 1 (based on GPT-5.2)</strong> leans towards rejection. This indicates a <strong>borderline case</strong>, where the result may vary depending on the reviewer's focus.<br><br>`;
+                } else if (!geminiAccept && gptAccept) {
+                    verdictClass = 'mixed';
+                    verdictTitle = '🤔 Atypical System Alignment';
+                    verdictText = `This is a rare case: the <strong>Agent System 1 (based on GPT-5.2)</strong> predicts acceptance, but the <strong>Agent System 2 (based on Gemini 3 Pro)</strong> remains critical. This suggests your paper has <strong>unconventional strengths</strong> that might be a hit with specific reviewers, even if others reject it.<br><br>`;
+                } else {
+                    verdictClass = 'negative';
+                    verdictTitle = '📋 Critical Consensus: Areas for Improvement';
+                    verdictText = `Both independent <strong>Agent Systems</strong> have reached a consensus for rejection. In our multi-agent system, this uniform signal suggests <strong>substantive issues</strong> that are likely to be identified during official peer review.<br><br>
+                    We recommend addressing the consolidated feedback from both systems before resubmission.<br><br>`
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="result-card">
+                        <div class="result-title">📄 ${result.title}</div>
+                        
+                        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                            Submission #<strong>${result.submission_number}</strong>
+                            &nbsp;|&nbsp; Forum: <code style="background: rgba(255,255,255,0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">${result.forum}</code>
+                        </div>
+                        
+                                                <div class="prediction-row">
+                            <span class="prediction-label">
+                                <svg style="width: 1.1rem; height: 1.1rem; vertical-align: middle; margin-right: 0.3rem;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.0462 6.0462 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.4848 4.4848 0 0 1 2.3655-1.9723V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.453l-.142.0805L8.704 5.4599a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l3.1028-1.7999 3.1028 1.7999v3.5916l-3.1028 1.7999-3.1028-1.7999z" fill="currentColor"/></svg>
+                                GPT-5.2 <span style="opacity: 0.6;">(Rigorous)</span>
+                            </span>
+                            <span class="prediction-value ${gptAccept ? 'accept' : 'reject'}">${result.gpt_prediction || 'N/A'}</span>
+                        </div>
+                        
+                        <div class="prediction-row">
+                            <span class="prediction-label">
+                                <img src="figures/gemini_logo.jpg" alt="Gemini" style="width: 1.1rem; height: 1.1rem; vertical-align: middle; margin-right: 0.3rem; border-radius: 2px;">
+                                Gemini 3 Pro <span style="opacity: 0.6;">(Lenient)</span>
+                            </span>
+                            <span class="prediction-value ${geminiAccept ? 'accept' : 'reject'}">${result.gemini_prediction || 'N/A'}</span>
+                        </div>
+                        
+                        <div class="verdict-box ${verdictClass}">
+                            <div class="verdict-title">${verdictTitle}</div>
+                            <div class="verdict-text">${verdictText}</div>
+                        </div>
+                    </div>
+                `;
+                resultDiv.style.display = 'block';
+                
+                // Scroll to result
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+            }, 100);
+        };
+        function toggleModelInfo() {
+            const content = document.getElementById('model-info-content');
+            const icon = document.getElementById('model-info-icon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▶';
+            }
+        }
+    </script>
+</body>
+</html>
